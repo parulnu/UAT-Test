@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAT 3.5 - Tax Group Feature Test Scenarios Report</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #333; padding: 30px; }
+        .report-header { background: linear-gradient(135deg, #1a237e 0%, #283593 100%); color: white; padding: 30px 40px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(26,35,126,0.3); }
+        .report-header h1 { font-size: 28px; margin-bottom: 8px; }
+        .report-header .subtitle { font-size: 16px; opacity: 0.9; }
+        .report-header .meta { margin-top: 15px; display: flex; gap: 30px; font-size: 14px; opacity: 0.85; flex-wrap: wrap; }
+        .toolbar { background: white; border-radius: 10px; padding: 15px 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .toolbar button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+        .btn-save { background: #1a237e; color: white; }
+        .btn-save:hover { background: #283593; }
+        .btn-load { background: #4a148c; color: white; }
+        .btn-load:hover { background: #6a1b9a; }
+        .btn-export { background: #1b5e20; color: white; }
+        .btn-export:hover { background: #2e7d32; }
+        .btn-reset { background: #b71c1c; color: white; }
+        .btn-reset:hover { background: #c62828; }
+        .toolbar .status-msg { font-size: 12px; color: #666; margin-left: auto; }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; }
+        .card .number { font-size: 36px; font-weight: 700; }
+        .card .label { font-size: 11px; color: #666; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section { background: white; border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .section h3 { color: #1a237e; margin-bottom: 15px; font-size: 16px; border-bottom: 2px solid #e8eaf6; padding-bottom: 10px; }
+        .tester-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+        .tester-chip { background: #e8eaf6; border-radius: 6px; padding: 8px 14px; font-weight: 500; color: #283593; font-size: 13px; }
+        .scenario-group { background: white; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+        .group-header { background: #e8eaf6; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .group-header h2 { font-size: 16px; color: #1a237e; }
+        .group-header .count { background: #1a237e; color: white; border-radius: 12px; padding: 3px 12px; font-size: 12px; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f5f5f5; padding: 10px 15px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #666; border-bottom: 2px solid #e0e0e0; }
+        td { padding: 10px 15px; border-bottom: 1px solid #f0f0f0; font-size: 13px; vertical-align: top; }
+        tr:hover td { background: #fafafa; }
+        .scenario-id { font-weight: 700; color: #1a237e; white-space: nowrap; }
+        .expected-outcome { line-height: 1.5; color: #444; }
+        .status-cell select { padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; cursor: pointer; width: 100%; }
+        .status-cell select.passed { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+        .status-cell select.failed { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
+        .status-cell select.blocked { background: #fff3e0; color: #e65100; border-color: #ffcc80; }
+        .status-cell select.not-executed { background: #f5f5f5; color: #666; border-color: #e0e0e0; }
+        .observations-cell { min-width: 150px; }
+        .observations-cell input { width: 100%; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
+        .observations-cell input:focus { border-color: #1a237e; outline: none; box-shadow: 0 0 0 2px rgba(26,35,126,0.1); }
+        .defect-cell input { width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
+        .defect-cell input:focus { border-color: #1a237e; outline: none; }
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .matrix-table th, .matrix-table td { padding: 10px 12px; text-align: center; border: 1px solid #e0e0e0; font-size: 12px; }
+        .matrix-table th { background: #e8eaf6; color: #1a237e; }
+        .matrix-table td:first-child { text-align: left; font-weight: 500; }
+        .note { margin-top: 30px; padding: 15px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50; font-size: 13px; color: #2e7d32; }
+        .tester-select { padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; margin-right: 10px; }
+        .current-tester { background: #e8eaf6; border-radius: 8px; padding: 8px 16px; font-size: 14px; color: #1a237e; font-weight: 600; display: none; }
+        @media print { .toolbar { display: none; } body { padding: 10px; } }
+    </style>
+</head>
+<body>
+    <div class="report-header">
+        <h1>UAT 3.5 - Tax Group Feature</h1>
+        <div class="subtitle">Test Scenarios Report - GCC UCM</div>
+        <div class="meta">
+            <span>Generated: 9 June 2026</span>
+            <span>Feature: Tax Groups</span>
+            <span>Scenarios: 42</span>
+            <span>Testers: 14</span>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <label><strong>Tester:</strong></label>
+        <select id="testerSelect" class="tester-select" onchange="loadTesterData()">
+            <option value="">-- Select Tester --</option>
+            <option value="Rowley, Caitlin">Rowley, Caitlin</option>
+            <option value="Denton, Maria">Denton, Maria</option>
+            <option value="Lombardo, Paolo">Lombardo, Paolo</option>
+            <option value="Cervi, Giovanni">Cervi, Giovanni</option>
+            <option value="Heylen, Jens">Heylen, Jens</option>
+            <option value="Zuromski, Julian">Zuromski, Julian</option>
+            <option value="Thiemann, Lukas">Thiemann, Lukas</option>
+            <option value="Camino, Noelia">Camino, Noelia</option>
+            <option value="Gordo Camin, Marta">Gordo Camin, Marta</option>
+            <option value="Batchelli i Abad, Laia">Batchelli i Abad, Laia</option>
+            <option value="Maris, Jean-Bertrand">Maris, Jean-Bertrand</option>
+            <option value="Maestracci, Stephanie">Maestracci, Stephanie</option>
+            <option value="Shrimpton, Paul">Shrimpton, Paul</option>
+            <option value="Rossi, Michelle">Rossi, Michelle</option>
+        </select>
+        <span class="current-tester" id="currentTesterLabel"></span>
+        <button class="btn-save" onclick="saveData()">Save Progress</button>
+        <button class="btn-export" onclick="exportCSV()">Export CSV</button>
+        <button class="btn-reset" onclick="resetData()">Reset</button>
+        <span class="status-msg" id="statusMsg">Select a tester to begin</span>
+    </div>
+
+    <div class="summary-cards">
+        <div class="card"><div class="number" id="totalCount">42</div><div class="label">Total Scenarios</div></div>
+        <div class="card"><div class="number" id="passedCount" style="color:#2e7d32">0</div><div class="label">Passed</div></div>
+        <div class="card"><div class="number" id="failedCount" style="color:#c62828">0</div><div class="label">Failed</div></div>
+        <div class="card"><div class="number" id="blockedCount" style="color:#e65100">0</div><div class="label">Blocked</div></div>
+        <div class="card"><div class="number" id="pendingCount" style="color:#666">42</div><div class="label">Not Executed</div></div>
+        <div class="card"><div class="number" id="completionPct" style="color:#1a237e">0%</div><div class="label">Completion</div></div>
+    </div>
+
+    <!-- Group 1: Template-level Tax group configuration -->
+    <div class="scenario-group">
+        <div class="group-header"><h2>Template-level Tax group configuration</h2><span class="count">6 scenarios</span></div>
+        <table>
+            <thead><tr><th style="width:60px">#</th><th style="width:25%">Description</th><th>Expected Outcome</th><th style="width:110px">Status</th><th style="width:180px">Observations</th><th style="width:80px">Defect</th></tr></thead>
+            <tbody>
+                <tr><td class="scenario-id">TG-001</td><td>Tax group toggle enables options at template level</td><td class="expected-outcome">Enabling the 'Tax group' toggle in template configuration makes Tax group options available for memo-level configuration.</td><td class="status-cell"><select data-id="TG-001" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-001" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-001" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-002</td><td>Tax group toggle disables options at template level</td><td class="expected-outcome">Disabling the 'Tax group' toggle removes all Tax group options from memo-level configuration.</td><td class="status-cell"><select data-id="TG-002" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-002" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-002" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-003</td><td>Other adjustments toggle auto-enables with Tax group</td><td class="expected-outcome">Enabling 'Tax group' toggle automatically enables the 'Other adjustments' table toggle in TIR configuration.</td><td class="status-cell"><select data-id="TG-003" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-003" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-003" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-004</td><td>Other adjustments toggle cannot be disabled when Tax group is on</td><td class="expected-outcome">While 'Tax group' is enabled, the 'Other adjustments' table toggle cannot be manually disabled.</td><td class="status-cell"><select data-id="TG-004" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-004" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-004" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-005</td><td>Other adjustments toggle retains state after Tax group disabled</td><td class="expected-outcome">Disabling 'Tax group' does not revert the Other adjustments toggle to its previous state.</td><td class="status-cell"><select data-id="TG-005" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-005" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-005" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-006</td><td>Existing templates without Tax group properties unchanged</td><td class="expected-outcome">Templates without Tax group properties behave as before; 'Tax group' toggle defaults to off.</td><td class="status-cell"><select data-id="TG-006" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-006" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-006" placeholder="ID"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Group 2: Memo-level Tax group type configuration -->
+    <div class="scenario-group">
+        <div class="group-header"><h2>Memo-level Tax group type configuration</h2><span class="count">6 scenarios</span></div>
+        <table>
+            <thead><tr><th style="width:60px">#</th><th style="width:25%">Description</th><th>Expected Outcome</th><th style="width:110px">Status</th><th style="width:180px">Observations</th><th style="width:80px">Defect</th></tr></thead>
+            <tbody>
+                <tr><td class="scenario-id">TG-007</td><td>Tax group toggles and naming convention visibility</td><td class="expected-outcome">Key Information page shows both Tax group toggles (disabled) and naming dropdown (disabled). Selecting a toggle enables the dropdown, defaulted to "tax group".</td><td class="status-cell"><select data-id="TG-007" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-007" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-007" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-008</td><td>Enabling 'group memo' disables 'entity belonging' toggle</td><td class="expected-outcome">Switching on 'group memo for a Tax group' automatically disables 'entity belonging to a Tax group'.</td><td class="status-cell"><select data-id="TG-008" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-008" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-008" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-009</td><td>Enabling 'entity belonging' disables 'group memo' toggle</td><td class="expected-outcome">Switching on 'entity belonging to a Tax group' automatically disables 'group memo for a Tax group'.</td><td class="status-cell"><select data-id="TG-009" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-009" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-009" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-010</td><td>Confirmation and data deletion when switching toggles</td><td class="expected-outcome">Switching between Tax group toggles shows a confirmation warning; on confirm, existing group-specific data is deleted.</td><td class="status-cell"><select data-id="TG-010" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-010" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-010" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-011</td><td>Naming convention substitution in guidance text</td><td class="expected-outcome">Selected naming convention (e.g., 'Fiscal unity') is substituted in all applicable guidance text.</td><td class="status-cell"><select data-id="TG-011" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-011" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-011" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-012</td><td>No Tax group controls when template doesn't support it</td><td class="expected-outcome">Memos on templates without Tax group enabled show no Tax group toggles or naming dropdown.</td><td class="status-cell"><select data-id="TG-012" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-012" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-012" placeholder="ID"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Group 3: Tax Losses - Entity name column -->
+    <div class="scenario-group">
+        <div class="group-header"><h2>Tax Losses - Entity name column</h2><span class="count">8 scenarios</span></div>
+        <table>
+            <thead><tr><th style="width:60px">#</th><th style="width:25%">Description</th><th>Expected Outcome</th><th style="width:110px">Status</th><th style="width:180px">Observations</th><th style="width:80px">Defect</th></tr></thead>
+            <tbody>
+                <tr><td class="scenario-id">TG-013</td><td>Entity name column displayed (group memo enabled)</td><td class="expected-outcome">Tax Losses section shows an 'Entity name' column when 'group memo' toggle is enabled.</td><td class="status-cell"><select data-id="TG-013" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-013" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-013" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-014</td><td>Required field validation on empty Entity name</td><td class="expected-outcome">Leaving Entity name empty shows 'This field is required' warning.</td><td class="status-cell"><select data-id="TG-014" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-014" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-014" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-015</td><td>Publish blocked with empty Entity name</td><td class="expected-outcome">Publish button is disabled when any Entity name field is empty.</td><td class="status-cell"><select data-id="TG-015" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-015" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-015" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-016</td><td>Entity name column hidden (entity belonging enabled)</td><td class="expected-outcome">Tax Losses section does not show Entity name column when 'entity belonging' toggle is enabled.</td><td class="status-cell"><select data-id="TG-016" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-016" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-016" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-017</td><td>Rolled-forward entity names carry forward</td><td class="expected-outcome">Entity names from previous year memo are carried forward in Tax Losses table.</td><td class="status-cell"><select data-id="TG-017" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-017" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-017" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-018</td><td>Delete icon on rolled-forward entity names</td><td class="expected-outcome">Each rolled-forward entity name row displays a delete icon.</td><td class="status-cell"><select data-id="TG-018" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-018" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-018" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-019</td><td>Dynamic guidance text with naming convention</td><td class="expected-outcome">Guidance text updates to include the selected naming convention.</td><td class="status-cell"><select data-id="TG-019" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-019" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-019" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-020</td><td>Entity name column read-only in view mode</td><td class="expected-outcome">Entity name column and values are displayed but read-only in view mode.</td><td class="status-cell"><select data-id="TG-020" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-020" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-020" placeholder="ID"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Group 4: Tax Credits - Entity name column -->
+    <div class="scenario-group">
+        <div class="group-header"><h2>Tax Credits - Entity name column</h2><span class="count">8 scenarios</span></div>
+        <table>
+            <thead><tr><th style="width:60px">#</th><th style="width:25%">Description</th><th>Expected Outcome</th><th style="width:110px">Status</th><th style="width:180px">Observations</th><th style="width:80px">Defect</th></tr></thead>
+            <tbody>
+                <tr><td class="scenario-id">TG-021</td><td>Entity name column displayed (group memo enabled)</td><td class="expected-outcome">Tax Credits section shows an 'Entity name' column when 'group memo' toggle is enabled.</td><td class="status-cell"><select data-id="TG-021" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-021" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-021" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-022</td><td>Required field validation on empty Entity name</td><td class="expected-outcome">Leaving Entity name empty shows 'This field is required' warning.</td><td class="status-cell"><select data-id="TG-022" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-022" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-022" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-023</td><td>Publish blocked with empty Entity name</td><td class="expected-outcome">Publish button is disabled when any Entity name field is empty.</td><td class="status-cell"><select data-id="TG-023" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-023" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-023" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-024</td><td>Entity name column hidden (entity belonging enabled)</td><td class="expected-outcome">Tax Credits section does not show Entity name column when 'entity belonging' toggle is enabled.</td><td class="status-cell"><select data-id="TG-024" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-024" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-024" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-025</td><td>Rolled-forward entity names carry forward</td><td class="expected-outcome">Entity names from previous year memo are carried forward in Tax Credits table.</td><td class="status-cell"><select data-id="TG-025" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-025" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-025" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-026</td><td>Delete icon on rolled-forward entity names</td><td class="expected-outcome">Each rolled-forward entity name row displays a delete icon.</td><td class="status-cell"><select data-id="TG-026" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-026" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-026" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-027</td><td>Dynamic guidance text with naming convention</td><td class="expected-outcome">Guidance text updates to include the selected naming convention.</td><td class="status-cell"><select data-id="TG-027" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-027" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-027" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-028</td><td>Entity name column read-only in view mode</td><td class="expected-outcome">Entity name column and values are displayed but read-only in view mode.</td><td class="status-cell"><select data-id="TG-028" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-028" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-028" placeholder="ID"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Group 5: TIR -->
+    <div class="scenario-group">
+        <div class="group-header"><h2>Taxable Income Reconciliation - Tax group adjustments</h2><span class="count">5 scenarios</span></div>
+        <table>
+            <thead><tr><th style="width:60px">#</th><th style="width:25%">Description</th><th>Expected Outcome</th><th style="width:110px">Status</th><th style="width:180px">Observations</th><th style="width:80px">Defect</th></tr></thead>
+            <tbody>
+                <tr><td class="scenario-id">TG-029</td><td>Tax group adjustments available (group memo enabled)</td><td class="expected-outcome">'Tax group adjustments' category appears in Other Adjustments table.</td><td class="status-cell"><select data-id="TG-029" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-029" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-029" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-030</td><td>Tax group adjustments available (entity belonging enabled)</td><td class="expected-outcome">'Tax group adjustments' category appears in Other Adjustments table.</td><td class="status-cell"><select data-id="TG-030" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-030" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-030" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-031</td><td>Tax group adjustments not available (neither toggle enabled)</td><td class="expected-outcome">'Tax group adjustments' category is not available when neither toggle is on.</td><td class="status-cell"><select data-id="TG-031" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-031" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-031" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-032</td><td>Other Adjustments table visible and cannot be hidden</td><td class="expected-outcome">When Tax group toggle is enabled at template level, Other Adjustments table is visible and unhideable.</td><td class="status-cell"><select data-id="TG-032" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-032" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-032" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-033</td><td>Tax group adjustments read-only in view mode</td><td class="expected-outcome">Tax group adjustments category and data display as read-only in view mode.</td><td class="status-cell"><select data-id="TG-033" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-033" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-033" placeholder="ID"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Group 6: Points of Interest -->
+    <div class="scenario-group">
+        <div class="group-header"><h2>Points of Interest - Group entity disclosure</h2><span class="count">6 scenarios</span></div>
+        <table>
+            <thead><tr><th style="width:60px">#</th><th style="width:25%">Description</th><th>Expected Outcome</th><th style="width:110px">Status</th><th style="width:180px">Observations</th><th style="width:80px">Defect</th></tr></thead>
+            <tbody>
+                <tr><td class="scenario-id">TG-034</td><td>Rich-text area displayed (group memo enabled)</td><td class="expected-outcome">A rich-text area titled 'Entities included in the [Selected Naming Convention]' is displayed.</td><td class="status-cell"><select data-id="TG-034" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-034" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-034" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-035</td><td>Disclosure area absent (entity belonging enabled)</td><td class="expected-outcome">Group entity disclosure area is not present.</td><td class="status-cell"><select data-id="TG-035" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-035" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-035" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-036</td><td>Disclosure area absent (neither toggle enabled)</td><td class="expected-outcome">Group entity disclosure area is not present.</td><td class="status-cell"><select data-id="TG-036" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-036" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-036" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-037</td><td>Dynamic header with naming convention</td><td class="expected-outcome">Header updates to 'Entities included in the [Selected Naming Convention]'.</td><td class="status-cell"><select data-id="TG-037" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-037" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-037" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-038</td><td>Dynamic guidance text with naming convention</td><td class="expected-outcome">Guidance text reflects the selected naming convention in place of default 'Tax group' term.</td><td class="status-cell"><select data-id="TG-038" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-038" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-038" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-039</td><td>Entity disclosure read-only in view mode</td><td class="expected-outcome">Rich-text area and content are displayed as read-only in view mode.</td><td class="status-cell"><select data-id="TG-039" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-039" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-039" placeholder="ID"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Group 7: Cover page -->
+    <div class="scenario-group">
+        <div class="group-header"><h2>Cover page - Tax group indicator</h2><span class="count">3 scenarios</span></div>
+        <table>
+            <thead><tr><th style="width:60px">#</th><th style="width:25%">Description</th><th>Expected Outcome</th><th style="width:110px">Status</th><th style="width:180px">Observations</th><th style="width:80px">Defect</th></tr></thead>
+            <tbody>
+                <tr><td class="scenario-id">TG-040</td><td>Cover page text for group memo</td><td class="expected-outcome">Cover page displays: 'This UCM is a group memo for a Tax group'.</td><td class="status-cell"><select data-id="TG-040" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-040" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-040" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-041</td><td>Cover page text for entity belonging to Tax group</td><td class="expected-outcome">Cover page displays: 'This UCM is for an entity that belongs to a Tax group'.</td><td class="status-cell"><select data-id="TG-041" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-041" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-041" placeholder="ID"></td></tr>
+                <tr><td class="scenario-id">TG-042</td><td>No Tax group indicator (neither toggle enabled)</td><td class="expected-outcome">No Tax group indicator displayed on cover page.</td><td class="status-cell"><select data-id="TG-042" onchange="updateStatus(this)"><option value="not-executed">Not Executed</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="blocked">Blocked</option></select></td><td class="observations-cell"><input type="text" data-id="TG-042" placeholder="Notes..."></td><td class="defect-cell"><input type="text" data-id="TG-042" placeholder="ID"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tester Progress Summary -->
+    <div class="section">
+        <h3>Tester Progress Summary</h3>
+        <table class="matrix-table" id="testerMatrix">
+            <thead>
+                <tr>
+                    <th>Tester</th>
+                    <th>Passed</th>
+                    <th>Failed</th>
+                    <th>Blocked</th>
+                    <th>Not Executed</th>
+                    <th>Completion %</th>
+                </tr>
+            </thead>
+            <tbody id="matrixBody"></tbody>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>How to use:</strong> Select your name from the Tester dropdown, update Status/Observations/Defect fields for each scenario, then click <strong>Save Progress</strong>. Data is stored in your browser's localStorage. Use <strong>Export CSV</strong> to download results.
+    </div>
+
+    <script>
+        const testers = [
+            'Rowley, Caitlin','Denton, Maria','Lombardo, Paolo','Cervi, Giovanni',
+            'Heylen, Jens','Zuromski, Julian','Thiemann, Lukas','Camino, Noelia',
+            'Gordo Camin, Marta','Batchelli i Abad, Laia','Maris, Jean-Bertrand',
+            'Maestracci, Stephanie','Shrimpton, Paul','Rossi, Michelle'
+        ];
+
+        function getStorageKey() {
+            const tester = document.getElementById('testerSelect').value;
+            return tester ? 'uat35_' + tester.replace(/[^a-zA-Z]/g, '_') : null;
+        }
+
+        function updateStatus(el) {
+            el.className = el.value;
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const selects = document.querySelectorAll('.status-cell select');
+            let passed = 0, failed = 0, blocked = 0, pending = 0;
+            selects.forEach(s => {
+                if (s.value === 'passed') passed++;
+                else if (s.value === 'failed') failed++;
+                else if (s.value === 'blocked') blocked++;
+                else pending++;
+            });
+            document.getElementById('passedCount').textContent = passed;
+            document.getElementById('failedCount').textContent = failed;
+            document.getElementById('blockedCount').textContent = blocked;
+            document.getElementById('pendingCount').textContent = pending;
+            const total = selects.length;
+            const pct = Math.round(((passed + failed + blocked) / total) * 100);
+            document.getElementById('completionPct').textContent = pct + '%';
+        }
+
+        function updateTesterMatrix() {
+            const tbody = document.getElementById('matrixBody');
+            tbody.innerHTML = '';
+            testers.forEach(t => {
+                const key = 'uat35_' + t.replace(/[^a-zA-Z]/g, '_');
+                const raw = localStorage.getItem(key);
+                let passed = 0, failed = 0, blocked = 0, pending = 42;
+                if (raw) {
+                    const data = JSON.parse(raw);
+                    Object.values(data).forEach(v => {
+                        if (v.status === 'passed') passed++;
+                        else if (v.status === 'failed') failed++;
+                        else if (v.status === 'blocked') blocked++;
+                    });
+                    pending = 42 - passed - failed - blocked;
+                }
+                const pct = Math.round(((passed + failed + blocked) / 42) * 100);
+                const row = document.createElement('tr');
+                row.innerHTML = '<td>' + t + '</td><td style="color:#2e7d32">' + (passed || '-') + '</td><td style="color:#c62828">' + (failed || '-') + '</td><td style="color:#e65100">' + (blocked || '-') + '</td><td>' + pending + '</td><td><strong>' + pct + '%</strong></td>';
+                tbody.appendChild(row);
+            });
+        }
+
+        function saveData() {
+            const key = getStorageKey();
+            if (!key) { alert('Please select a tester first.'); return; }
+            const data = {};
+            document.querySelectorAll('.status-cell select').forEach(s => {
+                const id = s.dataset.id;
+                data[id] = { status: s.value };
+            });
+            document.querySelectorAll('.observations-cell input').forEach(i => {
+                const id = i.dataset.id;
+                if (data[id]) data[id].observations = i.value;
+            });
+            document.querySelectorAll('.defect-cell input').forEach(i => {
+                const id = i.dataset.id;
+                if (data[id]) data[id].defect = i.value;
+            });
+            localStorage.setItem(key, JSON.stringify(data));
+            document.getElementById('statusMsg').textContent = 'Saved at ' + new Date().toLocaleTimeString();
+            updateTesterMatrix();
+        }
+
+        function loadTesterData() {
+            const tester = document.getElementById('testerSelect').value;
+            const label = document.getElementById('currentTesterLabel');
+            if (!tester) { label.style.display = 'none'; return; }
+            label.textContent = tester;
+            label.style.display = 'inline-block';
+            const key = getStorageKey();
+            // Reset all
+            document.querySelectorAll('.status-cell select').forEach(s => { s.value = 'not-executed'; s.className = 'not-executed'; });
+            document.querySelectorAll('.observations-cell input').forEach(i => { i.value = ''; });
+            document.querySelectorAll('.defect-cell input').forEach(i => { i.value = ''; });
+            if (key) {
+                const raw = localStorage.getItem(key);
+                if (raw) {
+                    const data = JSON.parse(raw);
+                    Object.keys(data).forEach(id => {
+                        const sel = document.querySelector('.status-cell select[data-id="' + id + '"]');
+                        if (sel) { sel.value = data[id].status; sel.className = data[id].status; }
+                        const obs = document.querySelector('.observations-cell input[data-id="' + id + '"]');
+                        if (obs && data[id].observations) obs.value = data[id].observations;
+                        const def = document.querySelector('.defect-cell input[data-id="' + id + '"]');
+                        if (def && data[id].defect) def.value = data[id].defect;
+                    });
+                }
+            }
+            updateSummary();
+            document.getElementById('statusMsg').textContent = 'Loaded data for: ' + tester;
+        }
+
+        function resetData() {
+            const key = getStorageKey();
+            if (!key) { alert('Please select a tester first.'); return; }
+            if (!confirm('Reset all fields for ' + document.getElementById('testerSelect').value + '? This cannot be undone.')) return;
+            localStorage.removeItem(key);
+            document.querySelectorAll('.status-cell select').forEach(s => { s.value = 'not-executed'; s.className = 'not-executed'; });
+            document.querySelectorAll('.observations-cell input').forEach(i => { i.value = ''; });
+            document.querySelectorAll('.defect-cell input').forEach(i => { i.value = ''; });
+            updateSummary();
+            updateTesterMatrix();
+            document.getElementById('statusMsg').textContent = 'Data reset for ' + document.getElementById('testerSelect').value;
+        }
+
+        function exportCSV() {
+            const tester = document.getElementById('testerSelect').value || 'Unknown';
+            let csv = 'Scenario ID,Description,Status,Observations,Defect ID,Tester\n';
+            document.querySelectorAll('.status-cell select').forEach(s => {
+                const id = s.dataset.id;
+                const row = s.closest('tr');
+                const desc = row.cells[1].textContent.replace(/,/g, ';');
+                const obs = row.querySelector('.observations-cell input').value.replace(/,/g, ';');
+                const def = row.querySelector('.defect-cell input').value;
+                csv += id + ',"' + desc + '",' + s.value + ',"' + obs + '",' + def + ',"' + tester + '"\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'UAT_3.5_Results_' + tester.replace(/[^a-zA-Z]/g, '_') + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Init
+        updateSummary();
+        updateTesterMatrix();
+    </script>
+</body>
+</html>
